@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31129.286
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrucksManagement", "TrucksManagement\TrucksManagement.csproj", "{CDBA9535-1552-4DFD-BC76-61702256567C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CDBA9535-1552-4DFD-BC76-61702256567C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDBA9535-1552-4DFD-BC76-61702256567C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDBA9535-1552-4DFD-BC76-61702256567C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDBA9535-1552-4DFD-BC76-61702256567C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BA2B6003-D393-456D-BDC7-7FB6DBB049FF}
+	EndGlobalSection
+EndGlobal

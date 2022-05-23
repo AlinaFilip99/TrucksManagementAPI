@@ -16,6 +16,7 @@ namespace TrucksManagement.Models.Representations
             PlateNumber = user.PlateNumber;
             DriversNumber = user.DriversNumber;
             PhoneNumber = user.PhoneNumber;
+            AdminID = user.AdminID;
         }
         public UserRepresentation()
         {
@@ -29,6 +30,7 @@ namespace TrucksManagement.Models.Representations
         public string PlateNumber { get; set; }
         public int DriversNumber { get; set; }
         public string PhoneNumber { get; set; }
+        public string AdminID { get; set; }
 
         internal User GetEntity(string id)
         {
@@ -41,7 +43,8 @@ namespace TrucksManagement.Models.Representations
                 PasswordHash = PasswordHash,
                 PlateNumber=PlateNumber,
                 DriversNumber=DriversNumber,
-                PhoneNumber=PhoneNumber
+                PhoneNumber=PhoneNumber,
+                AdminID=AdminID,
             };
         }
         internal User GetEntityWithoutId(string id)
@@ -54,7 +57,8 @@ namespace TrucksManagement.Models.Representations
                 PasswordHash = PasswordHash,
                 PlateNumber = PlateNumber,
                 DriversNumber = DriversNumber,
-                PhoneNumber = PhoneNumber
+                PhoneNumber = PhoneNumber,
+                AdminID=AdminID
             };
         }
     }

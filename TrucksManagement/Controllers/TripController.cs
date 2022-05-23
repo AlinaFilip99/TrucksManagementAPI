@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -17,10 +18,12 @@ namespace TrucksManagement.Controllers
     public class TripController : ControllerBase
     {
         protected readonly ITripRepository _tripRepository;
+        private readonly UserManager<User> _userManager;
 
-        public TripController(ITripRepository tripRepository)
+        public TripController(ITripRepository tripRepository, UserManager<User> userManager)
         {
             this._tripRepository = tripRepository;
+            this._userManager = userManager;
         }
 
         [HttpGet]
@@ -28,6 +31,24 @@ namespace TrucksManagement.Controllers
         public IEnumerable<TripRepresentation> Get()
         {
             return _tripRepository.GetTrips().Select(s => new TripRepresentation(s));
+        }
+
+        [HttpGet]
+        [Route("trip/user/{adminId?}")]
+        public async Task<IEnumerable<TripRepresentation>> GetAllByAdmin(string adminId)
+        {
+            var trucks = await _userManager.GetUsersInRoleAsync("User");
+            trucks=trucks.Where((x) => x.AdminID == adminId).ToList();
+            List<Trip> trips= new List<Trip>();
+            if (trucks.Count!=0)
+            {
+                foreach (var truck in trucks)
+                {
+                    var anterior = trips;
+                    trips = anterior.Concat(_tripRepository.GetTripsByTruck(truck.Id)).ToList();
+                }
+            }
+            return trips.Select(s => new TripRepresentation(s));
         }
 
         [HttpGet]

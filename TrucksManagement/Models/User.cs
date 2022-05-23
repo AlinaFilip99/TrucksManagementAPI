@@ -11,5 +11,6 @@ namespace TrucksManagement.Models
         public ICollection<Trip> Trips { get; set; }
         public string PlateNumber { get; set; }
         public int DriversNumber { get; set; }
+        public string AdminID { get; set; }
     }
 }

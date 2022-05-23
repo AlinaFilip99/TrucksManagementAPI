@@ -31,6 +31,19 @@ namespace TrucksManagement.Repositories
             }
         }
 
+        public void DeleteTripsByUser(string truckId)
+        {
+            var truckTrips = dbContext.Trips.Where(s => s.UserId == truckId).ToList();
+            if (truckTrips?.Count != 0)
+            {
+                foreach (var trip in truckTrips)
+                {
+                    dbContext.Remove(trip);
+                    dbContext.SaveChanges();
+                }
+            }
+        }
+
         public int GetMaxId()
         {
             return dbContext.Trips.Select(s => s.TripId).Max();

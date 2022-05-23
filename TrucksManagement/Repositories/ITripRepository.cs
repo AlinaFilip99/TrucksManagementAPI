@@ -13,6 +13,7 @@ namespace TrucksManagement.Repositories
         Trip AddTrip(Trip trip);
         Trip UpdateTrip(Trip trip);
         void DeleteTrip(int tripId);
+        void DeleteTripsByUser(string truckId);
         int GetMaxId();
         Trip GetTripById(int tripId);
     }

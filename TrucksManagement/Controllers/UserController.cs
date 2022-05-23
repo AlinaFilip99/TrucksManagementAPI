@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TrucksManagement.Models;
 using TrucksManagement.Models.Representations;
+using TrucksManagement.Repositories;
 
 namespace TrucksManagement.Controllers
 {
@@ -15,12 +16,14 @@ namespace TrucksManagement.Controllers
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        protected readonly ITripRepository _tripRepository;
         public UserController(UserManager<User> userManager, SignInManager<User> signInManager,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<IdentityRole> roleManager, ITripRepository tripRepository)
         {
             this._userManager = userManager;
             this._signInManager = signInManager;
             this._roleManager = roleManager;
+            this._tripRepository = tripRepository;
         }
         [HttpPost]
         [Route("user/signup")]
@@ -77,15 +80,27 @@ namespace TrucksManagement.Controllers
         }
         [HttpGet]
         [Route("user/trucks")]
-        public async Task<IList<User>> GetTrucks()
+        public async Task<IList<UserRepresentation>> GetTrucks()
         {
-            return await _userManager.GetUsersInRoleAsync("User");
+            var trucks = await _userManager.GetUsersInRoleAsync("User");
+            return trucks.Select(s => new UserRepresentation(s)).ToList();
+        }
+        [HttpGet]
+        [Route("user/trucks/{adminId?}")]
+        public async Task<IList<UserRepresentation>> GetTrucksByAdmin(string adminId)
+        {
+            var trucks=await _userManager.GetUsersInRoleAsync("User");
+            return trucks.Where((x) => x.AdminID == adminId).Select(s => new UserRepresentation(s)).ToList();
         }
         [HttpDelete]
         [Route("user/delete")]
         public async Task<IdentityResult> DeleteUser(string id)
         {
             User existentUser = await _userManager.FindByIdAsync(id);
+            if (existentUser!=null)
+            {
+                _tripRepository.DeleteTripsByUser(existentUser.Id);
+            }
             return await _userManager.DeleteAsync(existentUser);
         }
         [HttpPut]

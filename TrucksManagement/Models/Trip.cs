@@ -18,5 +18,6 @@ namespace TrucksManagement.Models
         public string Duration { get; set; } // 16:00
         public string StartDateTime { get; set; } // 2/16/2008 12:15:12 PM
         public string EndDateTime { get; set; } // 2/16/2008 12:15:12 PM
+        public bool IsFinished { get; set; }
     }
 }

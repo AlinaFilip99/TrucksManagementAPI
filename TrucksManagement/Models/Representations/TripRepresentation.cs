@@ -20,6 +20,7 @@ namespace TrucksManagement.Models.Representations
             StartDateTime = trip.StartDateTime;
             EndDateTime = trip.EndDateTime;
             IsFinished = trip.IsFinished;
+            IsDoneInTime = trip.IsDoneInTime;
         }
         public TripRepresentation()
         {
@@ -36,6 +37,7 @@ namespace TrucksManagement.Models.Representations
         public string StartDateTime { get; set; }
         public string EndDateTime { get; set; }
         public bool IsFinished { get; set; }
+        public bool IsDoneInTime { get; set; }
 
         internal Trip GetEntity(int id)
         {
@@ -53,6 +55,7 @@ namespace TrucksManagement.Models.Representations
                 StartDateTime = StartDateTime,
                 EndDateTime = EndDateTime,
                 IsFinished = IsFinished,
+                IsDoneInTime=IsDoneInTime,
             };
         }
         internal Trip GetEntityWithoutId(int id)
@@ -70,6 +73,7 @@ namespace TrucksManagement.Models.Representations
                 StartDateTime = StartDateTime,
                 EndDateTime = EndDateTime,
                 IsFinished=IsFinished,
+                IsDoneInTime=IsDoneInTime,
             };
         }
     }

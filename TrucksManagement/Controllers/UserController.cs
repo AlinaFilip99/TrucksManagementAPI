@@ -92,6 +92,34 @@ namespace TrucksManagement.Controllers
             var trucks=await _userManager.GetUsersInRoleAsync("User");
             return trucks.Where((x) => x.AdminID == adminId).Select(s => new UserRepresentation(s)).ToList();
         }
+        [HttpGet]
+        [Route("user/available")]
+        public async Task<IList<UserRepresentation>> GetTrucksByAvailability(string adminId, string startDate, string endDate)
+        {
+            var testStartDate = DateTime.Parse(startDate);
+            var testEndDate = DateTime.Parse(endDate);
+            var trucks = await _userManager.GetUsersInRoleAsync("User");
+            var adminTrucks= trucks.Where((x) => x.AdminID == adminId).Select(s => new UserRepresentation(s)).ToList();
+            List<UserRepresentation> availableTrucks=new List<UserRepresentation>();
+            foreach(var truck in adminTrucks)
+            {
+                var truckTrips = _tripRepository.GetTripsByTruck(truck.UserId).OrderBy(x => x.StartDateTime).ToList();
+                bool isValid = true;
+                foreach(var trip in truckTrips)
+                {
+                    if((testStartDate >=DateTime.Parse(trip.StartDateTime) && testStartDate <= DateTime.Parse(trip.EndDateTime)) ||
+                       (testEndDate >= DateTime.Parse(trip.StartDateTime) && testEndDate <= DateTime.Parse(trip.EndDateTime)))
+                    {
+                        isValid = false;
+                    }
+                }
+                if (isValid)
+                {
+                    availableTrucks.Add(truck);
+                }
+            }
+            return availableTrucks;
+        }
         [HttpDelete]
         [Route("user/delete")]
         public async Task<IdentityResult> DeleteUser(string id)

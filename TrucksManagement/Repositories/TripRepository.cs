@@ -81,6 +81,18 @@ namespace TrucksManagement.Repositories
                 result.Duration = trip.Duration;
                 result.StartDateTime = trip.StartDateTime;
                 result.EndDateTime = trip.EndDateTime;
+                if (trip.IsFinished)
+                {
+                    result.IsFinished = trip.IsFinished;
+                }
+                if (trip.IsActive)
+                {
+                    result.IsActive = trip.IsActive;
+                }
+                if (trip.IsDoneInTime)
+                {
+                    result.IsDoneInTime = trip.IsDoneInTime;
+                }
 
                 dbContext.SaveChanges();
 

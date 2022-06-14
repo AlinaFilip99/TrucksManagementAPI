@@ -127,7 +127,22 @@ namespace TrucksManagement.Controllers
             User existentUser = await _userManager.FindByIdAsync(id);
             if (existentUser!=null)
             {
-                _tripRepository.DeleteTripsByUser(existentUser.Id);
+                var role = await _userManager.GetRolesAsync(existentUser);
+                if (role.Count > 0)
+                {
+                    if (role[0] == "Admin")
+                    {
+                        var trucks = await _userManager.GetUsersInRoleAsync("User");
+                        var adminTrucks = trucks.Where((x) => x.AdminID == existentUser.Id).ToList();
+                        foreach(var truck in adminTrucks)
+                        {
+                            await _userManager.DeleteAsync(truck);
+                        }
+                    }
+                    else{
+                        _tripRepository.DeleteTripsByUser(existentUser.Id);
+                    }
+                }
             }
             return await _userManager.DeleteAsync(existentUser);
         }

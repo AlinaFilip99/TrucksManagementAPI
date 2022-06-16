@@ -7,37 +7,34 @@ using System.Linq;
 using System.Threading.Tasks;
 using TrucksManagement.Models;
 using TrucksManagement.Models.Representations;
-using TrucksManagement.Repositories;
-
-//https://docs.microsoft.com/en-us/dotnet/api/system.timespan.parse?view=net-6.0#System_TimeSpan_Parse_System_String_
-//https://docs.microsoft.com/en-us/dotnet/api/system.datetime.parse?view=net-6.0#System_DateTime_Parse_System_String_
+using TrucksManagement.Services;
 
 namespace TrucksManagement.Controllers
 {
     [ApiController]
     public class TripController : ControllerBase
     {
-        protected readonly ITripRepository _tripRepository;
-        private readonly UserManager<User> _userManager;
+        private readonly TripService _tripService;
+        private readonly UserService _userService;
 
-        public TripController(ITripRepository tripRepository, UserManager<User> userManager)
+        public TripController(TripService tripService, UserService userService)
         {
-            this._tripRepository = tripRepository;
-            this._userManager = userManager;
+            this._tripService = tripService;
+            this._userService = userService;
         }
 
         [HttpGet]
         [Route("trip")]
         public IEnumerable<TripRepresentation> Get()
         {
-            return _tripRepository.GetTrips().Select(s => new TripRepresentation(s));
+            return _tripService.GetAll().Select(s => new TripRepresentation(s));
         }
 
         [HttpGet]
         [Route("trip/user/{adminId?}")]
         public async Task<IEnumerable<TripRepresentation>> GetAllByAdmin(string adminId)
         {
-            var trucks = await _userManager.GetUsersInRoleAsync("User");
+            var trucks = await _userService.GetTrucks();
             trucks=trucks.Where((x) => x.AdminID == adminId).ToList();
             List<Trip> trips= new List<Trip>();
             if (trucks.Count!=0)
@@ -45,7 +42,7 @@ namespace TrucksManagement.Controllers
                 foreach (var truck in trucks)
                 {
                     var anterior = trips;
-                    trips = anterior.Concat(_tripRepository.GetTripsByTruck(truck.Id)).ToList();
+                    trips = anterior.Concat(_tripService.GetTruckTrips(truck.Id)).ToList();
                 }
             }
             return trips.Select(s => new TripRepresentation(s));
@@ -55,7 +52,7 @@ namespace TrucksManagement.Controllers
         [Route("trip/{tripId?}")]
         public TripRepresentation GetById(int tripId)
         {
-            var trip = new TripRepresentation(_tripRepository.GetTripById(tripId));
+            var trip = new TripRepresentation(_tripService.GetById(tripId));
             return trip;
         }
 
@@ -63,7 +60,7 @@ namespace TrucksManagement.Controllers
         [Route("trip/truck/{truckId?}")]
         public IEnumerable<TripRepresentation> GetByTruckId(string truckId)
         {
-            return _tripRepository.GetTripsByTruck(truckId).Select(s => new TripRepresentation(s));
+            return _tripService.GetTruckTrips(truckId).Select(s => new TripRepresentation(s));
         }
 
         [HttpPost]
@@ -73,7 +70,7 @@ namespace TrucksManagement.Controllers
             var max = 1;
             try
             {
-                max = _tripRepository.GetMaxId();
+                max = _tripService.GetMaxId();
             }
             catch
             {
@@ -81,7 +78,7 @@ namespace TrucksManagement.Controllers
             }
 
             var newTrip = trip.GetEntityWithoutId(max + 1);
-            _tripRepository.AddTrip(newTrip);
+            _tripService.AddNewTrip(newTrip);
             return trip;
         }
 
@@ -91,7 +88,7 @@ namespace TrucksManagement.Controllers
         {
             Trip newTrip;
             newTrip = trip.GetEntity(trip.TripId);
-            _tripRepository.UpdateTrip(newTrip);
+            _tripService.UpdateTrip(newTrip);
             return trip;
         }
 
@@ -99,7 +96,7 @@ namespace TrucksManagement.Controllers
         [Route("trip")]
         public int Delete(int id)
         {
-            _tripRepository.DeleteTrip(id);
+            _tripService.DeleteTrip(id);
             return id;
         }
     }

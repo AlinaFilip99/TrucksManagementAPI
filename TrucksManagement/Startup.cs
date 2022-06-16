@@ -18,6 +18,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TrucksManagement.Models;
 using TrucksManagement.Repositories;
+using TrucksManagement.Services;
 
 namespace TrucksManagement
 {
@@ -52,6 +53,8 @@ namespace TrucksManagement
                 (options => options.UseSqlServer(connection));
 
             services.AddScoped<ITripRepository, TripRepository>();
+            services.AddScoped<TripService>();
+            services.AddScoped<UserService>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>

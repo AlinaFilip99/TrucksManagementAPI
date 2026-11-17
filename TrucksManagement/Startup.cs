@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,14 +48,34 @@ namespace TrucksManagement
                 options.User.RequireUniqueEmail = true;
             });
 
-            var connection = @"Server=(localdb)\mssqllocaldb;Database=TruckManagementDb;Trusted_Connection=True;ConnectRetryCount=0";
-            services.AddDbContext<ApplicationContext>
-                (options => options.UseSqlServer(connection));
+            var databaseProvider = Configuration["DatabaseProvider"];
+            var connection = Configuration.GetConnectionString("DefaultConnection");
+            if (string.IsNullOrWhiteSpace(connection))
+            {
+                throw new InvalidOperationException("The DefaultConnection connection string is not configured.");
+            }
+
+            services.AddDbContext<ApplicationContext>(options =>
+            {
+                if (string.Equals(databaseProvider, "Sqlite", StringComparison.OrdinalIgnoreCase))
+                {
+                    options.UseSqlite(connection);
+                }
+                else if (string.Equals(databaseProvider, "SqlServer", StringComparison.OrdinalIgnoreCase))
+                {
+                    options.UseSqlServer(connection);
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Unsupported database provider '{databaseProvider}'.");
+                }
+            });
 
             services.AddScoped<ITripRepository, TripRepository>();
             services.AddScoped<TripService>();
             services.AddScoped<UserService>();
 
+            services.AddCors();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -68,6 +88,12 @@ namespace TrucksManagement
         {
             if (env.IsDevelopment())
             {
+                using (var scope = app.ApplicationServices.CreateScope())
+                {
+                    var database = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
+                    database.Database.EnsureCreated();
+                }
+
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => { 
@@ -76,7 +102,10 @@ namespace TrucksManagement
                 });
             }
 
-            app.UseHttpsRedirection();
+            if (!env.IsDevelopment())
+            {
+                app.UseHttpsRedirection();
+            }
 
             app.UseRouting();
             app.UseCors(action => action.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
